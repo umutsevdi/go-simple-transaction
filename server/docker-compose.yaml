@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - mongodb_data_container:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - dbnet
+
+  # App backend service
+  app:
+    build:
+      context: cmd
+      dockerfile: Dockerfile
+    restart: on-failure:5 
+    volumes:
+      - file_storage_volume:/app/storage
+    ports:
+      - "3000:8080"
+
+    environment:
+      ENV_URI:  mongodb://root:password@mongo:27017
+      ENV_PORT: 3000
+
+    depends_on:
+      - mongo # This service depends on MongoDB. Start that first.
+    networks:
+      - dbnet
+
+volumes:
+  mongodb_data_container: 
+  file_storage_volume:
+networks:
+  dbnet:
+    driver: bridge
