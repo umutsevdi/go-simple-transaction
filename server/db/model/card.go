@@ -17,10 +17,10 @@ type Collection mongo.Collection
 
 // One of accounts' cards
 type Card struct {
-	Id       uint32   `json:"id"`
-	Owner    uint32   `json:"owner_id"`
+	Id       string   `json:"_id"`
+	Owner    string   `json:"owner_id"`
 	Iban     string   `json:"iban"`
-	TrsctIds []uint32 `json:"transaction_ids"`
+	TrsctIds []string `json:"transaction_ids"`
 	cache    *BalanceCache
 	pin      uint16
 	CardType uint8 `json:"card_type"`
@@ -35,8 +35,8 @@ type BalanceCache struct {
 
 // A struct that defines a
 type Transaction struct {
-	Id     uint32 `json:"id"`
-	From   uint32 `json:"from"`
-	To     uint32 `json:"to"`
+	Id     string `json:"_id"`
+	From   string `json:"from"`
+	To     string `json:"to"`
 	Amount uint64 `json:"amount"`
 }

@@ -13,8 +13,8 @@ import (
 type Application struct {
 	InfoLog  *log.Logger
 	ErrorLog *log.Logger
-	Client   *mongo.Client
-	Ctx      *context.Context
+	Collections *[]*mongo.Collection
+	Ctx *context.Context
 }
 
 func (app *Application) ServerError(w http.ResponseWriter, err error) {

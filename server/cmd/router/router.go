@@ -11,6 +11,7 @@ func SetRoutes(app *config.Application) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", handler.Home(app))
+	mux.HandleFunc("/accounts", handler.GetAccounts(app))
 
 	return mux
 }

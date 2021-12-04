@@ -4,7 +4,7 @@ import "time"
 
 // An account struct that holds credit cards
 type Account struct {
-	Id           uint32    `json:"id"`
+	Id           string    `json:"_id"`
 	Fame         string    `json:"first_name"`
 	Lname        string    `json:"last_name"`
 	Dob          time.Time `json:"date_of_birth"`

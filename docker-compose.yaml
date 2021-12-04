@@ -17,7 +17,7 @@ services:
   # App backend service
   app:
     build:
-      context: cmd
+      context: server
       dockerfile: Dockerfile
     restart: on-failure:5 
     volumes:

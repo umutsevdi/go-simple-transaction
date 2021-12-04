@@ -21,8 +21,9 @@ func main() {
 	// Configuring server attributes
 	port := flag.String("port", ":3000", "Port address for the application")
 	uri := flag.String("uri", "mongodb://root:password@localhost:27017", "MongoDB database access URI")
+	databaseName := flag.String("db", "app", "Name of the database")
 	flag.Parse()
-	fmt.Println("flag.port:\t" + *port + "\nflag.uri:\t" + *uri)
+	fmt.Println("\nflag.uri:\t" + *uri + "flag.port:\t" + *port + "\ndb:\t" + *databaseName)
 
 	// Connecting to the MongoDB via MongoDB drive using the uri
 	client, err := mongo.NewClient(options.Client().ApplyURI(*uri))
@@ -39,28 +40,80 @@ func main() {
 
 	defer client.Disconnect(ctx)
 
-	databases, err := client.ListDatabaseNames(ctx, bson.M{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(databases)
-
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	app := &config.Application{
 		InfoLog:  infoLog,
 		ErrorLog: errorLog,
+		Collections: InitDB(client,&ctx,*databaseName),
+		Ctx:    &ctx,
 	}
 
 	srv := &http.Server{
 		Addr:    *port,
 		Handler: router.SetRoutes(app),
+
 	}
+
 
 	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+}
+
+func InitDB(client *mongo.Client,ctx *context.Context, dbName string)(*[]*mongo.Collection){
+	databases, err := client.ListDatabaseNames(*ctx, bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(databases)
+
+	db := client.Database(dbName)
+
+	collections, err := client.Database(dbName).ListCollectionNames(*ctx, bson.D{})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(collections)
+
+	// Checking collections using prime number method
+	flag := 1
+	for i := 0; i < len(collections); i++ {
+		if collections[i] == "account" {
+			flag *= 2
+			fmt.Println("skipping account ")
+		}else if collections[i] == "card"{
+			flag *= 3
+			fmt.Println("skipping card ")
+		}else if collections[i] == "transaction"{
+			flag *= 5
+			fmt.Println("skipping transaction ")
+		}
+	}
+	fmt.Println(flag)
+
+	if flag % 2 != 0{
+		db.CreateCollection(*ctx, "account")
+		fmt.Println("creating account")
+	}
+
+	if flag % 3 != 0{
+		db.CreateCollection(*ctx, "card")
+		fmt.Println("creating card")
+	}
+
+	if flag % 5 != 0{
+		db.CreateCollection(*ctx, "transaction")
+		fmt.Println("creating transaction")
+	}
+	
+	collectionArray := make([]*mongo.Collection,3)
+	collectionArray[0] = db.Collection("account")
+	collectionArray[1] = db.Collection("card")
+	collectionArray[2] = db.Collection("transaction")
+	return 	&collectionArray
 }
