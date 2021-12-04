@@ -1,4 +1,4 @@
-package db
+package model
 
 import (
 	"time"
@@ -17,19 +17,19 @@ type Collection mongo.Collection
 
 // One of accounts' cards
 type Card struct {
-	Id       uint32 `json:"id"`
-	Owner    uint32 `json:"owner_id"`
-	Iban     string `json:"iban"`
+	Id       uint32   `json:"id"`
+	Owner    uint32   `json:"owner_id"`
+	Iban     string   `json:"iban"`
 	TrsctIds []uint32 `json:"transaction_ids"`
-	cache    *BalanceCache 
-	pin      uint16 
+	cache    *BalanceCache
+	pin      uint16
 	CardType uint8 `json:"card_type"`
 }
 
 // A struct that is used to cache the net balance until a set amount of time, so that we wouldn't
 // have to calculate each transaction from the bottom
 type BalanceCache struct {
-	Until   time.Time 
+	Until   time.Time
 	Balance int64
 }
 
