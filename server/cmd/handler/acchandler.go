@@ -56,3 +56,20 @@ func GetAccountById(app *config.Application, id string) http.HandlerFunc {
 		fmt.Fprintln(w, account)
 	}
 }
+
+func CreateAccount(app *config.Application, account model.Account) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		
+		if r.URL.Path != "/accounts/find" {
+			app.NotFound(w)
+			return
+		}
+		accCollection := (*app.Collections)[0]
+		insertRes, err := accCollection.InsertOne(context.TODO(), account)
+		if err != nil {
+			app.NotFound(w)
+			return
+		}
+		fmt.Fprintln(w, insertRes)
+	}
+}
